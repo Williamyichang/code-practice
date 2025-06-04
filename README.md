@@ -7,7 +7,7 @@ Welcome to my **Code Practice Repository**! This space serves as a collection of
 
 1. 🎯 Number Guessing Game
 
-Files**: `day1_0_guessing_game.py`, `day1_0_gussing_game.ipynb`
+Files**: `day1_0_guessing_game.py`, `day1_0_guessing_game.ipynb`
 Description**: A classic game where the computer selects a random number, and the player attempts to guess it. Features input validation, attempt limits, and user feedback.
 
 2. ➕ Sum Numbers
