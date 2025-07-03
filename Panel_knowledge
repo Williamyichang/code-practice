@@ -26,3 +26,7 @@
 水分 vs. 有機溶劑	60 °C / 90 % RH 形成的氣泡往往含有混合氣體（水蒸氣＋有機單體/溶劑）。後段儲存條件若為乾燥環境或真空封包，水分含量更低，重新釋放的主要是低揮發有機物，體積膨脹效率遠低於水汽。
 封膠吸脹—收縮循環造成結構疲勞	多次熱濕循環會讓封膠微裂／空隙增大，反而可能導致新的氣泡或邊緣滲漏，並不會把既有氣泡「吹大」到原始大小。
 
+Question : when TFT-LCD processing in RA such as ______ and happened LC bubble in edge side and near seanlant, and then put this  
+LC bubble's panel to higher temperature(=______), the LC  would be smaller , and then storage to ___ , two hours, and LC 
+still keep in this size no recovery to original size, even in room temperature still keep this size, please tell me
+one most possible root cause that LC bubble happened for what reason ?
