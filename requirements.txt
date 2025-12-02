@@ -2,3 +2,455 @@ jupyter
 matplotlib
 numpy
 pytest
+
+Developer Guide: Creating Custom Python Components in Langflow
+
+While Langflow offers a rich set of built-in components, its true power lies in its extensibility. The platform is designed to grow with your needs, allowing you to move beyond pre-built options and forge your own solutions. This guide provides a comprehensive, step-by-step walkthrough for developers to build, configure, and deploy custom Python components. By following these instructions, you will learn to integrate new features, connect to external services, and implement specialized logic directly within the Langflow visual editor, unlocking the full potential of your AI workflows.
+
+
+--------------------------------------------------------------------------------
+
+
+1.0 The Fundamentals of Custom Components
+
+1.1 Introduction to Section
+
+Custom components are the primary mechanism for extending Langflow's core functionality. They allow developers to tailor the platform to specific needs by integrating proprietary logic, connecting to unique APIs, or performing specialized data manipulation. These custom-built nodes integrate seamlessly into the visual editor, behaving just like native components and enabling powerful, reusable, and highly specific workflow designs.
+
+1.2 What are Custom Components?
+
+At its core, a custom component is a Python class that inherits from langflow.custom.Component. Each component in Langflow's node-based environment is designed to perform a discrete function, acting as a modular building block within a larger flow. Every custom component is defined by three core elements:
+
+* Inputs: The data or parameters the component requires to execute its logic. These are sourced from user input in the UI or from the outputs of upstream components.
+* Outputs: The data the component provides to downstream nodes after processing. These serve as the inputs for the next components in the chain.
+* Logic: The internal process of transforming the inputs into outputs. This is where the unique functionality of the component resides.
+
+1.3 The Value of Extensibility
+
+Creating custom components provides several key advantages that transform Langflow from a standard visual builder into a fully extensible development platform.
+
+* Unlimited Extensibility: Integrate new features, call external services, or add any specialized tool or advanced logic your application requires.
+* Reusability: Encapsulate complex logic into modular, reusable blocks that can be easily shared and incorporated into multiple flows, promoting consistency and accelerating development.
+* Automatic UI Generation: Langflow automatically generates the component's fields and connection ports in the visual editor directly from your input and output definitions, creating an intuitive user experience with no front-end coding required.
+* Type-Safe Connections: By defining the data types for inputs and outputs, Langflow enforces type-safe connections between nodes, ensuring a robust and predictable data flow and preventing incompatible connections.
+
+1.4 Section Conclusion
+
+Now that we've covered the conceptual role of a component, let's examine the specific Python class structure that serves as its technical blueprint.
+
+
+--------------------------------------------------------------------------------
+
+
+2.0 The Anatomy of a Langflow Component
+
+2.1 Introduction to Section
+
+Every custom component is built upon a consistent and well-defined Python class structure. This standardized anatomy ensures that custom logic can be seamlessly discovered, rendered, and executed by the Langflow engine. Understanding this structure, including its mandatory base class and metadata attributes, is the critical first step to building components that integrate perfectly with the Langflow user interface.
+
+2.2 The Base Component Class and Structure
+
+All custom components must inherit from the langflow.custom.Component class. This base class provides the foundational methods and properties that the Langflow engine relies on. The fundamental parts of a component's structure include:
+
+* The Python class definition inheriting from Component.
+* Class-level attributes that provide metadata for identification and description in the UI.
+* inputs and outputs class-level lists that define the component's data flow contract.
+* Methods that implement the component's core logic and correspond to the defined outputs.
+* Internal variables and hooks (self.status, self.log, self.ctx) for logging, status updates, and state management.
+
+2.3 Essential Class Attributes (Metadata)
+
+These class-level attributes control a component's appearance and behavior in the Langflow visual editor. Defining them correctly is essential for creating a professional and user-friendly experience.
+
+Attribute	Description
+display_name	A user-friendly label shown in the visual editor.
+description	A brief summary shown in tooltips and displayed below the component name when it is added to a flow.
+icon	A decorative icon from Langflow's icon library that appears next to the component's name. Langflow uses the Lucide icon library; set this attribute to the string name of an icon (e.g., "file-text").
+name	A unique internal identifier for the component. Typically, this matches the name of the folder containing the component's code.
+documentation	An optional link to external documentation, such as detailed API references or product guides.
+
+2.4 A Minimal Component Skeleton
+
+The following code provides the universal starting point for any new custom component. It includes the necessary imports and the basic class structure with placeholder metadata and I/O lists.
+
+from langflow.custom import Component
+from langflow.template import Output
+
+class MyComponent(Component):
+    display_name = "My Component"
+    description = "A short summary."
+    icon = "sparkles"
+    name = "MyComponent"
+
+    inputs = []
+    outputs = []
+
+    def some_output_method(self):
+        return ...
+
+
+2.5 Section Conclusion
+
+With the static blueprint of a component established, we now turn to the dynamic contract that governs its interactions: the definition of its inputs and outputs.
+
+
+--------------------------------------------------------------------------------
+
+
+3.0 Defining Inputs and Outputs
+
+3.1 Introduction to Section
+
+A component's inputs and outputs form its public contract, dictating what data it consumes and produces. These definitions are not just for internal data processing; Langflow uses them directly to render the component's user interface, including its configuration fields, connection ports, and validation logic. Proper configuration of inputs and outputs is therefore essential for creating a component that is both functional and user-friendly.
+
+3.2 Configuring Inputs
+
+Inputs are defined as a class-level list named inputs. Each item in the list is an instance of a specific input class from langflow.io, which determines the type of UI element rendered in the editor. The most common constructor parameters for these input classes are:
+
+* name: The internal variable name used to access the input's value within the component (e.g., self.name).
+* display_name: The user-friendly label for the field shown in the visual editor.
+* info: Optional help text that appears as a tooltip.
+* value: An optional default value for the field.
+* advanced: A boolean that, if True, moves the field into the "Advanced" section of the component's settings.
+* required: A boolean that, if True, requires the user to provide a value.
+* is_list: A boolean that, if True, allows the input to accept multiple values.
+* input_types: An optional list of strings (e.g., ["Data"]) to restrict the types of outputs that can be connected to this input.
+
+The most commonly used input classes are grouped by their function:
+
+Text Inputs
+
+* StrInput: Creates a single-line text field.
+* MultilineInput: Creates a multi-line text area for longer text.
+
+Numeric and Boolean Inputs
+
+* BoolInput: Renders a boolean toggle switch.
+* IntInput: A field for integer values.
+* FloatInput: A field for floating-point values.
+
+Selection and Secret Inputs
+
+* DropdownInput: Provides a dropdown menu with predefined options.
+* SecretStrInput: A specialized field for sensitive data like API keys, which hides the input value.
+
+Specialized Data Inputs
+
+* DataInput: Expects a structured Data object.
+* MessageInput: Expects a Message object, typically used in chat and agent flows.
+* MessageTextInput: Simplifies access to the .text field of a Message.
+
+File and Handle Inputs
+
+* FileInput: Allows users to upload files directly through the UI.
+* HandleInput: Used for creating specialized connection ports for specific object types.
+
+3.3 Configuring Outputs
+
+Outputs are defined in a class-level list named outputs. Each entry in this list is an instance of the Output class from langflow.io. This defines the connection points from which data can be passed to other components.
+
+The common parameters for the Output class are:
+
+* name: The internal variable name for the output.
+* display_name: The user-friendly label shown for the output connection port.
+* method: The string name of the class method that is called to generate the output data. This creates a direct link between the output definition and its implementation.
+* info: Optional help text that appears when a user hovers over the output port.
+
+3.4 Section Conclusion
+
+Having defined the component's data contract through its inputs and outputs, we can now implement the core logic that transforms one into the other, governed by the component's execution lifecycle.
+
+
+--------------------------------------------------------------------------------
+
+
+4.0 Implementing Component Logic and Lifecycle
+
+4.1 Introduction to Section
+
+Beyond its structure and I/O contract, a component's core is its execution logic. This is where the transformation of inputs into outputs occurs. This section deconstructs the internal lifecycle managed by the Langflow engine, explains how to implement the methods that produce outputs, and details how to manage internal state during execution.
+
+4.2 The Component Execution Lifecycle
+
+The Langflow engine manages a consistent execution flow for every component in a graph. Understanding this sequence is key to implementing logic correctly.
+
+1. Instantiation: The component class is instantiated, and its internal structures are initialized.
+2. Assigning Inputs: Values from the UI fields or upstream component connections are assigned to the component's input attributes.
+3. Validation and Setup: Optional lifecycle hooks, such as _pre_run_setup, are executed to perform any necessary validation or one-time setup before the main logic runs.
+4. Outputs Generation: The engine calls a primary execution method like run() or build_results(), which in turn triggers the specific output methods defined in the outputs list.
+
+4.3 Implementing Output Methods
+
+Each Output object defined in the outputs list must be linked to a corresponding method within the component class.
+
+* The name of the method must be a string that exactly matches the method parameter in its corresponding Output definition.
+* Within the method, you can access the values of any defined inputs using self.<input_name>.
+* The method should perform its processing and return the final data, typically as a Message, Data, or DataFrame object.
+
+The following example demonstrates a method that reads a file. It accesses the filename input via self.filename, reads the file's content, sets a user-facing status message with self.status, and returns the content wrapped in a Data object.
+
+# Corresponding Output definition in the `outputs` list:
+# Output(display_name="File Contents", name="file_contents", method="read_file")
+
+def read_file(self) -> Data:
+    path = self.filename
+    with open(path, "r") as f:
+        content = f.read()
+    self.status = f"Read {len(content)} chars from {path}"
+    return Data(data={"content": content})
+
+
+4.4 Common Internal Patterns and Hooks
+
+For more advanced control over execution and state, Langflow provides several internal methods and properties.
+
+Initialization with _pre_run_setup()
+
+This method is an optional hook that runs once before the main execution logic. It is ideal for one-time setup tasks, such as initializing counters or ensuring a resource is available.
+
+def _pre_run_setup(self):
+    if not hasattr(self, "_initialized"):
+        self._initialized = True
+        self.iteration = 0
+
+
+Custom Execution with _run()
+
+While the default execution flow covers most use cases, you can override async def _run(self): to implement completely custom execution logic if your component requires a non-standard processing sequence.
+
+Shared State with self.ctx
+
+self.ctx is a dictionary-like object that persists across a single component's execution run. It can be used to store and share data or state between different methods within the component, such as passing a counter value from one step to another.
+
+def some_method(self):
+    count = self.ctx.get("my_count", 0)
+    self.ctx["my_count"] = count + 1
+
+
+4.5 Section Conclusion
+
+Now that the core execution logic is clear, we can explore advanced features that unlock more dynamic, interactive, and powerful component behaviors.
+
+
+--------------------------------------------------------------------------------
+
+
+5.0 Advanced Component Features
+
+5.1 Introduction to Section
+
+Once the fundamentals are mastered, you can leverage Langflow's advanced features to build more sophisticated and user-friendly components. This section details powerful capabilities such as handling multiple outputs, creating dynamic user interfaces that respond to user input, enabling agent integration with "Tool Mode," and using type annotations to improve flow validation.
+
+5.2 Handling Multiple Outputs
+
+A component is not limited to a single output; it can define multiple Output objects in its outputs list. The group_outputs class attribute controls how these outputs are presented and behave in the UI.
+
+* group_outputs=False (Default): When a component has multiple outputs and this parameter is False or not set, the outputs are grouped into a single output port in the UI. Users must select which output they want to use from a dropdown menu. This is ideal when a component can return different types of data, but only one is needed at a time in a given flow.
+* group_outputs=True: Setting this to True creates a separate, simultaneously available output port for each defined output. This allows a user to connect multiple downstream components in parallel, each receiving a different piece of data from the component. This is useful when a component produces multiple values that need to be used in parallel.
+
+5.3 Creating Dynamic and Interactive UIs
+
+Dynamic fields allow you to create components with inputs that appear, disappear, or change based on other user interactions. This creates a more intuitive and context-aware experience.
+
+* To make an input controllable, set dynamic=True in its constructor.
+* To trigger an update when an input's value changes, set real_time_refresh=True.
+
+When a field with real_time_refresh=True is modified, Langflow calls the component's update_build_config method. This method receives the current configuration and allows you to modify it programmatically.
+
+The following RegexRouter example shows how update_build_config can show or hide the regex_pattern field based on the value selected in the operator dropdown.
+
+class RegexRouter(Component):
+    display_name = "Regex Router"
+    description = "Demonstrates dynamic fields for regex input."
+
+    inputs = [
+        DropdownInput(
+            name="operator",
+            display_name="Operator",
+            options=["equals", "contains", "regex"],
+            value="equals",
+            real_time_refresh=True,
+        ),
+        StrInput(
+            name="regex_pattern",
+            display_name="Regex Pattern",
+            info="Used if operator='regex'",
+            dynamic=True,
+            show=False,
+        ),
+    ]
+
+    def update_build_config(self, build_config: dict, field_value: str, field_name: str | None = None) -> dict:
+        if field_name == "operator":
+            if field_value == "regex":
+                build_config["regex_pattern"]["show"] = True
+            else:
+                build_config["regex_pattern"]["show"] = False
+        return build_config
+
+
+Within update_build_config, you can also modify other properties like required, advanced, and options to create highly interactive UIs.
+
+5.4 Enabling "Tool Mode" for Agents
+
+Tool Mode is a powerful feature that allows a component to be used as a "tool" by other components, most notably Agents. When an input has tool_mode=True, an Agent can invoke the component's functionality programmatically to complete a task.
+
+This feature can be enabled by setting tool_mode=True on an input. Langflow currently supports Tool Mode for the following input types:
+
+* DataInput
+* DataFrameInput
+* PromptInput
+* MessageTextInput
+* MultilineInput
+* DropdownInput
+
+5.5 The Importance of Typed Annotations
+
+Using Python's typed annotations on output methods (e.g., def my_method(self) -> Data:) is critical for creating a robust and intuitive user experience in the Langflow UI.
+
+The benefits of typed annotations include:
+
+* Color-Coding: Outputs are assigned distinct colors based on their return type (e.g., Data, Message), making data flow easier to visualize.
+* Validation: Langflow can automatically block incompatible connections, preventing users from connecting an output of one type to an input that expects another.
+* Readability: Type hints make the code clearer for other developers, explicitly stating what kind of data a method is expected to return.
+* Development Tools: Code editors can leverage type hints to provide better code suggestions and error checking during development.
+
+Common return types include Message, Data, and DataFrame. While primitive types like str and int are allowed, it is recommended to wrap them in a Data or Message object for better type consistency and UI behavior.
+
+5.6 Section Conclusion
+
+These advanced features provide the tools to build powerful components, but power must be paired with reliability. The next section details the practices for ensuring component robustness through effective error handling and logging.
+
+
+--------------------------------------------------------------------------------
+
+
+6.0 Robustness and Debugging
+
+6.1 Introduction to Section
+
+Building production-quality components requires more than just correct logic; it demands robust error handling and clear logging. A component should manage unexpected situations gracefully and provide valuable feedback to the user when things go wrong. This section covers the techniques available in Langflow to handle errors, provide useful status updates, and log detailed information for effective debugging.
+
+6.2 Error Handling Techniques
+
+Langflow supports two primary techniques for managing errors within a component's logic.
+
+* Raise Exceptions: The most straightforward approach is to raise a standard Python exception, such as ValueError. Langflow's engine will automatically catch these exceptions and display a clear error message in the component's UI. This immediately halts the component's execution and alerts the user to a critical problem.
+* Return Structured Error Data: For non-critical errors where you might want the flow to continue, you can return a Data object containing an error key. This allows the component to signal that an error occurred without stopping the entire flow. Downstream components can then be designed to check for this error key and handle the situation.
+
+6.3 Logging and Status Updates
+
+Langflow provides several built-in tools for providing feedback to the user and logging internal events for debugging.
+
+* self.status: This attribute allows you to display a short, user-facing message directly on the component in the visual editor. It's perfect for showing success summaries, progress updates, or concise error notifications (e.g., self.status = f"Parsed {len(rows)} rows successfully.").
+* self.stop(...): In components with multiple output branches, you can use self.stop("output_name") to halt a specific output path if a condition is not met, without stopping the entire component. This preserves the correct behavior for other, unaffected outputs.
+* self.log(...): For more detailed, developer-focused information, use self.log("message"). These log messages appear in the "Logs" or "Events" section of the component's detail view. They provide a clear trace of the component's internal behavior, which is invaluable for debugging complex logic.
+
+6.4 Best Practices for Robust Components
+
+To build reliable and maintainable components, consider the following best practices:
+
+1. Validate Inputs Early: Check for missing or invalid inputs at the beginning of your methods to fail fast and prevent broken logic downstream.
+2. Summarize with self.status: Use short, clear success or error summaries in self.status to help users quickly understand the result of an operation.
+3. Return Structured Errors: When appropriate, return Data(data={"error": ...}) instead of raising exceptions to allow for more graceful, flow-level error handling.
+4. Stop Outputs Selectively: Use self.stop(...) to halt specific output paths only when necessary, preserving the flow's behavior for other branches.
+5. Keep Logs Concise: Focus on logging meaningful events and messages to avoid cluttering the debug view and make troubleshooting easier.
+
+6.5 Section Conclusion
+
+With a complete understanding of how to build and debug a robust component, the final step is to package it correctly so the Langflow engine can discover and load it.
+
+
+--------------------------------------------------------------------------------
+
+
+7.0 Packaging and Deployment
+
+7.1 Introduction to Section
+
+For Langflow to recognize and load your custom components, they must be organized in a specific directory structure. This structure is not merely a convention but a requirement for the component discovery mechanism. This section provides the mandatory guidelines for structuring component files, including how to package them within a custom Docker image for portable and scalable deployments.
+
+7.2 Required Directory Structure
+
+Langflow searches for custom components in the directory specified by the LANGFLOW_COMPONENTS_PATH environment variable. If this variable is not set, it defaults to a /components directory. Within this base path, your components must be organized into subfolders that represent categories in the UI.
+
+/your/custom/components/path/    # Base directory set by LANGFLOW_COMPONENTS_PATH
+ └── category_name/              # Required category subfolder (e.g., "helpers")
+     ├── __init__.py             # Required empty file
+     └── custom_component.py     # Your component file
+
+
+There are two critical rules for this structure:
+
+1. Every component file must reside within a category subfolder. The name of this folder (e.g., helpers) determines the category under which your component will appear in the Langflow menu. Components placed directly in the base directory will not be loaded.
+2. Each category subfolder must contain an __init__.py file. This file can be empty, but its presence is required for Python to recognize the folder as a package, which is necessary for Langflow to properly import the components within it.
+
+For example, a component placed in /app/custom_components/helpers/custom_component.py will appear in the "Helpers" category, while a component at /app/custom_components/custom_component.py will be ignored.
+
+7.3 Deploying Components within a Custom Docker Image
+
+For containerized deployments, the recommended approach is to bundle your custom code into a new Docker image built on top of the base Langflow image. This creates a self-contained, portable environment. The provided example shows how to modify a core Langflow component (memory.py), but the same principle applies to adding new custom components by copying them into the appropriate category subfolder within the image's site-packages.
+
+The following Dockerfile demonstrates this process:
+
+FROM langflowai/langflow:latest
+
+# Set working directory
+WORKDIR /app
+
+# Copy your modified component
+# This example assumes your custom component is in `src/backend/base/langflow/components/helpers/memory.py`
+COPY src/backend/base/langflow/components/helpers/memory.py /tmp/memory.py
+
+# Find the site-packages directory where langflow is installed
+RUN python -c "import site; print(site.getsitepackages()[0])" > /tmp/site_packages.txt
+
+# Replace the file in the site-packages location
+RUN SITE_PACKAGES=$(cat /tmp/site_packages.txt) && \
+    echo "Site packages at: $SITE_PACKAGES" && \
+    mkdir -p "$SITE_PACKAGES/langflow/components/helpers" && \
+    cp /tmp/memory.py "$SITE_PACKAGES/langflow/components/helpers/"
+
+# Clear Python cache in the site-packages directory only
+RUN SITE_PACKAGES=$(cat /tmp/site_packages.txt) && \
+    find "$SITE_PACKAGES" -name "*.pyc" -delete && \
+    find "$SITE_PACKAGES" -name "__pycache__" -type d -exec rm -rf {} +
+
+# Expose the default Langflow port
+EXPOSE 7860
+
+# Command to run Langflow
+CMD ["python", "-m", "langflow", "run", "--host", "0.0.0.0", "--port", "7860"]
+
+
+To use this Dockerfile, follow these steps:
+
+1. Create a project directory for your custom setup (e.g., langflow-custom).
+2. Inside it, create the subfolder structure to house your custom component file (e.g., src/backend/base/langflow/components/helpers/).
+3. Place your component .py file into the appropriate subfolder.
+4. Create the Dockerfile in the root of your project directory.
+5. Build and run the custom Docker image using docker build and docker run.
+
+7.4 Section Conclusion
+
+By following these packaging and deployment guidelines, you ensure your custom components are correctly integrated into any Langflow environment. To conclude, let's reinforce the key principles for building high-quality components.
+
+
+--------------------------------------------------------------------------------
+
+
+8.0 Conclusion and Next Steps
+
+8.1 Summary of Best Practices
+
+This guide has covered the end-to-end process of creating custom components in Langflow. To build high-quality, maintainable, and user-friendly components, always keep these key best practices in mind:
+
+* Always Annotate Outputs: Specify return types like -> Data, -> Message, or -> DataFrame on your output methods. This enables critical UI features like color-coding and connection validation.
+* Wrap Raw Data: Instead of returning plain dictionaries or strings, wrap them in Data or Message objects to ensure type consistency and better integration with other components.
+* Manage Dynamic Fields Thoughtfully: Use dynamic fields to create a clean, contextual UI, but avoid overly complex logic. Hide fields rather than removing them to preserve user input.
+* Prioritize Robust Error Handling: Validate inputs early and use a combination of raising exceptions for critical failures and returning structured errors for non-blocking issues.
+* Use Logging and Status Effectively: Provide clear, concise user feedback with self.status and use self.log to record detailed information for effective debugging.
+
+8.2 Contributing to Langflow
+
+As you develop useful and innovative components, consider contributing them to the official Langflow project. Sharing your work helps grow the ecosystem and benefits the entire community. For more information on the contribution process, please refer to the official How to Contribute documentation.
