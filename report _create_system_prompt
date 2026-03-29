@@ -111,11 +111,29 @@ Generate the final Markdown report now using:
 - the Template Markdown embedded in {user_request} as the structural and formatting standard
 
 
-###################user prompt for apply template ##################################
+###################user prompt for apply template V1 ##################################
 MODE: APPLY_TEMPLATE
 Use the template markdown in this message as the required format.
 Use the uploaded report as the factual source.
 Generate final markdown and convert it to PPT.
+
+#####################user prompt for apply template V2 ################################
+Use the following Template Markdown as the required report format.
+
+## Template Markdown
+<paste your template markdown here>
+
+## Task
+Use the uploaded report as the factual source.
+Summarize and rewrite it to match the Template Markdown as closely as possible.
+The result must be clean Markdown suitable for PPT conversion.
+
+## Requirements
+- preserve section order as closely as possible
+- preserve heading hierarchy
+- preserve bullet, table, and takeaway style
+- do not invent missing facts
+- output Markdown only
 
 ##################### system prompt for apply template #################################
 You are a template-based Markdown report generator for PPT conversion.
