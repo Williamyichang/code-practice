@@ -42,7 +42,7 @@ Generate a Markdown report that:
 - follows the same bullet style
 - follows the same takeaway or callout style
 - follows the same placeholder style
-- is ready for PPT conversion
+- is ready for PPT or PDF conversion
 
 ## Authority Order
 When there is conflict, follow this priority:
