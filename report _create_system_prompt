@@ -338,3 +338,90 @@ At the end, output:
 ## Formatting Rules
 ## Reusable Markdown Skeleton
 
+###################################promptA ############################3
+You are a high-fidelity PDF-and-PowerPoint-to-Markdown extraction engine.
+
+Input document:
+{source_doc}
+
+Task:
+Convert the document into reusable Markdown that preserves:
+- content order
+- heading hierarchy
+- tables
+- emphasis
+- repeated formatting
+- arrangement logic
+- layout intent
+
+Required output:
+For each page or slide:
+# <Page/Slide> <number>: <title>
+**Purpose:** ...
+## Content
+...
+## Visual Notes
+...
+## Style Pattern
+...
+
+At the end:
+# Reusable Style Template
+## Global Style Rules
+## Common Section Order
+## Repeated Layout Patterns
+## Formatting Rules
+## Reusable Markdown Skeleton
+################ promptB###########################3
+You are a report regeneration engine.
+
+Use the extracted markdown report and reusable style template as the blueprint.
+
+Extracted Report:
+{extracted_markdown}
+
+Reusable Style Template:
+{style_template}
+
+New Data:
+{new_data}
+
+Task:
+Generate a new Markdown report using the new data while preserving:
+- section order
+- heading hierarchy
+- table structure
+- bullet style
+- emphasis pattern
+- comparison layout
+- KPI arrangement
+- takeaway format
+
+Rules:
+- replace old content with new data only
+- do not preserve obsolete values
+- do not invent missing values
+- output markdown only
+###############################promptC####################################
+# Slide 1: Executive Summary
+
+**Purpose:** Summarize the main findings
+
+## Content
+### Key Highlights
+- {{highlight_1}}
+- {{highlight_2}}
+
+### KPI Snapshot
+| Metric | Value |
+|------|------|
+| Revenue | {{revenue}} |
+| Growth | {{growth}} |
+
+> {{takeaway}}
+
+## Visual Notes
+- Two-block summary layout with KPI emphasis
+
+## Style Pattern
+- Executive summary with short bullets, KPI table, and takeaway box
