@@ -806,3 +806,22 @@ Requirements:
 - preserve the template’s structure and formatting logic
 - do not invent missing facts
 - return markdown only
+######################flow ##########################
+How to wire it in Langflow
+Flow 1
+Chat Input file upload = template report
+Chat Input text = user request
+AI Summary output = {report_summary}
+Chat Input text output = {user_request}
+system prompt output → LLM System Message
+Chat Input → LLM Input
+LLM → Chat Output
+
+Flow 2
+Chat Input file upload = new report
+Chat Input text = user request
+optional pasted blueprint = {template_blueprint}
+AI Summary output = {report_summary}
+system prompt output → LLM System Message
+Chat Input → LLM Input
+LLM → Chat Output
