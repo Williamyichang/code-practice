@@ -781,3 +781,28 @@ Avoid these mistakes:
 
 ## Final Instruction
 Generate the final Markdown report using the uploaded report summary as source content and the Template Blueprint from the user message as the required structural and formatting standard.
+
+##################user prompt A ########################## need to upload template report first ##############################3
+Build a reusable Template Blueprint from the uploaded template report.
+
+Requirements:
+- infer a reusable markdown reporting format
+- define section order
+- define formatting rules
+- define a reusable markdown skeleton
+- return markdown only
+
+###################user prompt B ################# need to upload new reports ################################
+Use the following Template Blueprint as the required report format.
+
+## Template Blueprint
+<paste the full Template Blueprint here>
+
+Task:
+Generate a new markdown report from the uploaded report that follows this blueprint as closely as possible.
+
+Requirements:
+- preserve meaning from the uploaded report
+- preserve the template’s structure and formatting logic
+- do not invent missing facts
+- return markdown only
