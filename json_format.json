@@ -1,0 +1,46 @@
+{
+  "conversation_id": "langflow-session-001",
+  "source_system": "Langflow",
+  "source_summary": "本 Skill 由完整問答萃取而來。",
+  "skill_name": "完整問答萃取型動態 Skill 產生 Skill",
+  "scenario_description": "當使用者希望將一次完整問答中形成的成功任務方法，轉換成未來可重複使用的 Skill 文件時，使用此 Skill。",
+  "trigger_conditions": [
+    "使用者要求根據完整問答內容產生 Skill 文件",
+    "使用者強調工作流程編排指引必須來自整段對話"
+  ],
+  "anti_trigger_conditions": [
+    "使用者只需要一般摘要，而不是可重用 Skill"
+  ],
+  "prompt_fragment": "你是一個 Skill Candidate Summary Agent。你必須根據完整問答內容填好 Skill JSON 的每一個欄位。",
+  "workflow_orchestration_guide": [
+    "先讀取完整問答內容，辨識使用者一開始提出的目標、系統架構與 Skill 文件必要欄位。",
+    "追蹤使用者後續修正，尤其是工作流程編排指引必須依據完整問答內容產生。",
+    "保留問答中形成的 API 與 Agent 分工。",
+    "輸出符合 Thin Skill Creator API schema 的 JSON，讓 API 不需要再進行語意判斷。"
+  ],
+  "input_requirements": [
+    "完整問答內容或重要對話片段"
+  ],
+  "tool_requirements": [
+    "Langflow Summary Agent",
+    "FastAPI Thin Skill Creator API"
+  ],
+  "output_contract": "輸出必須是合法 JSON，並符合 Thin Skill Creator API 的 SkillCandidateInput schema。",
+  "validation_checklist": [
+    "Skill 是否描述可重用能力",
+    "workflow_orchestration_guide 是否依據完整問答內容萃取"
+  ],
+  "risk_notes": [
+    "如果 Summary Agent 輸出不是合法 JSON，API Request 會失敗"
+  ],
+  "reusable_pattern": "將完整問答中形成的成功任務方法萃取成結構化 Skill JSON。",
+  "non_reusable_details_to_avoid": [
+    "單次測試 conversation_id",
+    "本機測試 URL",
+    "固定通用流程模板"
+  ],
+  "status": "needs_review",
+  "metadata": {
+    "flow_name": "dynamic_skill_creator_flow"
+  }
+}
